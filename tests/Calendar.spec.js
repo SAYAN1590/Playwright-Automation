@@ -4,7 +4,7 @@ test('Calendar Validations', async ({browser,page})=>
 {
         const date = "15";
         const monthNumber = "6";
-        const year = "1690";
+        const year = "2010";
         const currentYear = new Date().getFullYear();
 
         await page.goto("https://rahulshettyacademy.com/seleniumPractise/#/offers");
