@@ -1,7 +1,28 @@
-const {test, expect}= require('@playwright/test');
+const {test, expect, request}= require('@playwright/test');
+const loginPayLoad = {userEmail:"chhutkuritam@gmail.com",userPassword:"Iamsrk@1590"};
+let token;
+test.beforeAll( async()=>
+{
+    const apiContext = await request.newContext()
+    const loginResponse = await apiContext.post("https://rahulshettyacademy.com/api/ecom/auth/login",
+        {
+            data:loginPayLoad
+        })
+    expect(loginResponse.ok()).toBeTruthy();
+
+    const loginResponseJson = await loginResponse.json();
+    token = loginResponseJson.token;
+    console.log(token);
+});
+
 
 test('Client App Test', async ({page})=>
 {
+    page.addInitScript(value => {
+        window.localStorage.setItem('token',value);
+
+    },token);
+
     const userName= page.locator("#userEmail");
     const password = page.locator("#userPassword");
     const signIn = page.locator("[value='Login']");
@@ -9,16 +30,6 @@ test('Client App Test', async ({page})=>
     const productName= "ZARA COAT 3";
     const email= "chhutkuritam@gmail.com";
     await page.goto("https://rahulshettyacademy.com/client");
-    console.log(await page.title());
-    //css
-    await userName.fill(email);
-    await password.fill("Iamsrk@1590");
-    await signIn.click();
-   
-    // console.log(await cardTitles.first().textContent());
-    // console.log(await cardTitles.nth(1).textContent());
-
-    await page.waitForLoadState('networkidle'); // not working as discouraged from Playwright as well
     await products.last().locator("b").waitFor(); //alternative way
     const count = await products.count();
     //ZARA COAT 3
@@ -100,8 +111,5 @@ test('Client App Test', async ({page})=>
     const orderIdDetails= await page.locator("div.col-text").textContent();
 
     expect(orderID.includes(orderIdDetails)).toBeTruthy();
-
-
-
 });
 
